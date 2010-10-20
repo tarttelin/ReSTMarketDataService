@@ -1,12 +1,10 @@
 package com.pyruby.marketdata;
 
-import com.sun.grizzly.http.SelectorThread;
 import com.sun.grizzly.http.embed.GrizzlyWebServer;
 import com.sun.grizzly.http.servlet.ServletAdapter;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.api.container.grizzly.GrizzlyWebContainerFactory;
 import com.sun.jersey.spi.container.servlet.ServletContainer;
 import org.junit.After;
 import org.junit.Before;
@@ -15,7 +13,7 @@ import org.junit.Test;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 public class MarketDataEndToEndTest {
     private GrizzlyWebServer ws;
@@ -23,16 +21,16 @@ public class MarketDataEndToEndTest {
     @Before
     public void setUp() throws IOException {
         ws = new GrizzlyWebServer(9998);
-        ServletAdapter jerseyServletAdapter = new ServletAdapter();
-        jerseyServletAdapter.setServletInstance(new ServletContainer());
-        jerseyServletAdapter.addInitParameter(
+        ServletAdapter jersey = new ServletAdapter();
+        jersey.setServletInstance(new ServletContainer());
+        jersey.addInitParameter(
             "com.sun.jersey.config.property.packages", "com.pyruby.marketdata.restapi");
-        jerseyServletAdapter.setServletPath("/ms");
+        jersey.setServletPath("/ms");
 
         // HERE IS HOW YOU ADD A FILTER
-        //jerseyServletAdapter.addFilter(new MyFilter(), "HibernateSessionFilter", null);
+        //jersey.addFilter(new MyFilter(), "HibernateSessionFilter", null);
 
-        ws.addGrizzlyAdapter(jerseyServletAdapter);
+        ws.addGrizzlyAdapter(jersey);
         ws.start();
 
     }
@@ -67,5 +65,20 @@ public class MarketDataEndToEndTest {
         type(MediaType.APPLICATION_XML_TYPE).
         put(ClientResponse.class, request);
         assertEquals(201, response.getClientResponseStatus().getStatusCode());
+    }
+
+    @Test
+    public void put_shouldReturn400_givenInvalidXml() {
+        fail("Todo");
+    }
+
+    @Test
+    public void get_shouldReturn404_givenNoBondStored() {
+        fail("Todo");
+    }
+
+    @Test
+    public void get_shouldReturnBondXML_givenAStoredBond() {
+        fail("Carry on from here");
     }
 }

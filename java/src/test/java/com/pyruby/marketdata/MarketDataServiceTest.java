@@ -3,12 +3,14 @@ package com.pyruby.marketdata;
 import com.pyruby.marketdata.model.Bond;
 import com.pyruby.marketdata.model.Tenor;
 import com.pyruby.marketdata.serializer.BondRepresentation;
-import com.pyruby.marketdata.serializer.TenorRepresentation;
+import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
+import static com.pyruby.marketdata.BondBuilder.newBond;
+import static com.pyruby.marketdata.BondBuilder.newTenor;
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.mock;
@@ -17,25 +19,31 @@ import static org.mockito.Mockito.when;
 
 
 public class MarketDataServiceTest {
+    private MarketDataRepository repo;
+    private MarketDataService svc;
 
+    @Before
+    public void setUp() {
+        repo = mock(MarketDataRepository.class);
+        svc = new MarketDataServiceImpl(repo);
+    }
+    
     @Test
     public void storeYieldCurve_marshalsXmlRequestIntoDomainObjectBeforeCallingPersistenceLayer() {
-        
-        BondRepresentation bondRepr = new BondRepresentation();
-        bondRepr.setName("British Petrolium");
-        bondRepr.setTicker("LON:BP");
-        bondRepr.setMaturity("5Y");
-        bondRepr.setIssuer("British Petrolium");
-        bondRepr.addTenor(createTenor("3m", 40D));
-        bondRepr.addTenor(createTenor("6m", 40D));
-        bondRepr.addTenor(createTenor("9m", 40D));
-        bondRepr.addTenor(createTenor("1Y", 40D));
-        bondRepr.addTenor(createTenor("2Y", 160D));
-        bondRepr.addTenor(createTenor("3Y", 160D));
-        bondRepr.addTenor(createTenor("4Y", 160D));
-        bondRepr.addTenor(createTenor("5Y", 160D));
-        MarketDataRepository repo = mock(MarketDataRepository.class);
-        MarketDataService svc = new MarketDataServiceImpl(repo);
+        BondRepresentation bondRepr = newBond()
+                .name("British Petrolium")
+                .ticker("LON:BP")
+                .maturity("5Y")
+                .issuer("UK Government")
+                .withTenors(newTenor("3m", 40d)
+                        .newTenor("6m", 42.3d)
+                        .newTenor("9m", 42.3d)
+                        .newTenor("1Y", 45d)
+                        .newTenor("2Y", 47.3d)
+                        .newTenor("3Y", 49.8d)
+                        .newTenor("4Y", 52.3d)
+                        .newTenor("5Y", 55.3d)
+                ).createRepresentation();
         when(repo.save(isA(Bond.class))).thenAnswer(new Answer<Bond>() {
             public Bond answer(InvocationOnMock invocationOnMock) throws Throwable {
                 Bond bond = (Bond) invocationOnMock.getArguments()[0];
@@ -56,16 +64,30 @@ public class MarketDataServiceTest {
         assertEquals("British Petrolium", bond.getName());
         assertEquals("LON:BP", bond.getTicker());
         assertEquals("5Y", bond.getMaturity());
-        assertEquals("British Petrolium", bond.getIssuer());
+        assertEquals("UK Government", bond.getIssuer());
         assertEquals(new Tenor("3m", 40.0), bond.getTenors().get(0));
         assertEquals(123L, bond.getId());
     }
 
-    private TenorRepresentation createTenor(String period, double bps) {
-        TenorRepresentation tenorRepr = new TenorRepresentation();
-        tenorRepr.setPeriod(period);
-        tenorRepr.setBasisPoints(bps);
-        return tenorRepr;
+    @Test
+    public void findBondByNameAndMaturity_returnsNull_givenNoCorrespondingBond() {
+        MarketDataRepository repo = mock(MarketDataRepository.class);
+        MarketDataService svc = new MarketDataServiceImpl(repo);
+
+        assertNull(svc.findBondByNameAndMaturity("NoSuchBond","2Y"));
+    }
+
+    @Test
+    public void findBondByNameAndMaturity_returnsBondRepresentation_givenAStoredBond() {
+        Bond bond = newBond().name("Yahoo").maturity("3Y").createBond();
+        MarketDataRepository repo = mock(MarketDataRepository.class);
+        MarketDataService svc = new MarketDataServiceImpl(repo);
+        when(repo.findByNameAndMaturity("Yahoo", "3Y")).thenReturn(bond);
+
+        BondRepresentation found = svc.findBondByNameAndMaturity("Yahoo", "3Y");
+
+        assertEquals(bond.getName(), found.getName());
+        assertEquals(bond.getMaturity(), found.getMaturity());
     }
 
 }

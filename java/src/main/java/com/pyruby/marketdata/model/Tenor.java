@@ -7,8 +7,8 @@ public class Tenor {
     public Tenor() {}
 
     public Tenor(String interval, double bps) {
-        this.interval = interval;
-        this.bps = bps;
+        this.setInterval(interval);
+        this.setBps(bps);
     }
 
     public String getInterval() {
@@ -48,5 +48,13 @@ public class Tenor {
         temp = bps != +0.0d ? Double.doubleToLongBits(bps) : 0L;
         result = 31 * result + (int) (temp ^ (temp >>> 32));
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return "Tenor{" +
+                "interval='" + interval + '\'' +
+                ", bps=" + bps +
+                '}';
     }
 }

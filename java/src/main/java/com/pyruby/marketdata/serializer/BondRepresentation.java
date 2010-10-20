@@ -23,6 +23,21 @@ public class BondRepresentation {
     @XmlElement(name="Tenor")
     private List<TenorRepresentation> tenors = new ArrayList<TenorRepresentation>();
 
+    public BondRepresentation(Bond bond) {
+        name = bond.getName();
+        ticker = bond.getTicker();
+        maturity = bond.getMaturity();
+        issuer = bond.getIssuer();
+        for (Tenor tenor : bond.getTenors()) {
+            TenorRepresentation repr = new TenorRepresentation();
+            repr.setPeriod(tenor.getInterval());
+            repr.setBasisPoints(tenor.getBps());
+            addTenor(repr);
+        }
+    }
+
+    public BondRepresentation() {}
+
     public String getName() {
         return name;
     }
