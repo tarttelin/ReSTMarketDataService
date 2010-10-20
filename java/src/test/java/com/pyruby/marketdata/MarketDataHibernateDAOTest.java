@@ -38,10 +38,10 @@ public class MarketDataHibernateDAOTest extends MarketDataIntegrationTestCase {
         bond2.setMaturity("3Y");
         repo.save(bond2);
 
-        Bond foundBond = repo.findByNameAndMaturity(bond.getName(), bond.getMaturity());
-        assertEquals(bond.getName(), foundBond.getName());
-        assertEquals(bond.getMaturity(), foundBond.getMaturity());
-        assertEquals(bond.getTenors().size(), foundBond.getTenors().size());
+        Bond foundBond = repo.findByNameAndMaturity(bond2.getName(), bond2.getMaturity());
+        assertEquals(bond2.getName(), foundBond.getName());
+        assertEquals(bond2.getMaturity(), foundBond.getMaturity());
+        assertEquals(bond2.getTenors().size(), foundBond.getTenors().size());
     }
 
     private Bond createBond() {
