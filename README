@@ -1,3 +1,5 @@
 This project is a side-by-side implementation of a very simple MarketDataService in both Java and Python.  Though the service itself is stripped down to very basic requirements, it is a full stack implementation, using architecture that is fairly typical of enterprise environments handling large amounts of data.
 
-The purpose of this exercise is to highlight the differences between a Python and a Java ReSTful service.
+The purpose of this exercise is to highlight the differences between a Python and a Java ReSTful service.  The source code here is not licensed, and is freely distributable, amendable etc without any reference back to the author (though you can if you wish;-) ).  The reason for the complete lack of restrictions is so that it can be used as a quick start template for any project, ripped apart and done with as you wish without any restrictions or need to check with the company lawyers whether any legal ramifications exist in it's use.  
+
+ 
