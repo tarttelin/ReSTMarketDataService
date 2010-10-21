@@ -57,4 +57,8 @@ public class Bond {
     public long getId() {
         return id;
     }
+
+    public boolean isValid() {
+        return name != null && maturity != null && tenors != null && !tenors.isEmpty();
+    }
 }

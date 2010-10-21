@@ -29,7 +29,7 @@ public class MarketDataServiceTest {
     }
     
     @Test
-    public void storeYieldCurve_marshalsXmlRequestIntoDomainObjectBeforeCallingPersistenceLayer() {
+    public void storeBond_marshalsXmlRequestIntoDomainObjectBeforeCallingPersistenceLayer() throws MarketDataServiceException {
         BondRepresentation bondRepr = newBond()
                 .name("British Petrolium")
                 .ticker("LON:BP")
@@ -67,6 +67,15 @@ public class MarketDataServiceTest {
         assertEquals("UK Government", bond.getIssuer());
         assertEquals(new Tenor("3m", 40.0), bond.getTenors().get(0));
         assertEquals(123L, bond.getId());
+    }
+
+
+    @Test(expected=MarketDataServiceException.class)
+    public void storeBond_throwsAMarketDataServiceException_givenAnInvalidBond() throws MarketDataServiceException {
+        MarketDataRepository repo = mock(MarketDataRepository.class);
+        MarketDataService svc = new MarketDataServiceImpl(repo);
+
+        svc.storeBond(newBond().name(null).createRepresentation());        
     }
 
     @Test

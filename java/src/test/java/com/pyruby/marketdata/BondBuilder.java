@@ -5,6 +5,7 @@ import com.pyruby.marketdata.model.Tenor;
 import com.pyruby.marketdata.serializer.BondRepresentation;
 import com.pyruby.marketdata.serializer.TenorRepresentation;
 
+import javax.xml.bind.JAXBElement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -71,6 +72,22 @@ public class BondBuilder {
         return this;
     }
 
+    public BondBuilder withoutTenors() {
+        tenor.clear();
+        return this;
+    }
+
+    public String createXml() {
+        StringBuilder xml = new StringBuilder("<Bond>");
+        if (name != null) xml.append("<Name>").append(name).append("</Name>");
+        if (ticker != null) xml.append("<Ticker>").append(ticker).append("</Ticker>");
+        if (maturity != null) xml.append("<Maturity>").append(maturity).append("</Maturity>");
+        if (issuer != null) xml.append("<Issuer>").append(issuer).append("</Issuer>");
+        xml.append(tenor.createXml());
+        xml.append("</Bond>");
+        return xml.toString();
+    }
+
     static class Pair<K,V> {
         final K key;
         final V value;
@@ -106,6 +123,19 @@ public class BondBuilder {
                 tenorList.add(new Tenor(tenor.key, tenor.value));
             }
             return tenorList;
+        }
+
+        public String createXml() {
+            StringBuilder xml = new StringBuilder("<Tenors>");
+            for (Pair<String, Double> tenor : tenors) {
+                xml.append("<Tenor period=\"").append(tenor.key).append("\" bps=\"").append(tenor.value).append("\"/>");
+            }
+            xml.append("</Tenors>");
+            return xml.toString();
+        }
+
+        public void clear() {
+            tenors.clear();
         }
     }
 }

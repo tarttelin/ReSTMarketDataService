@@ -20,9 +20,15 @@ public class MarketDataHibernateDAO implements MarketDataRepository {
         return bond;
     }
 
+    /*
+     * This shouldn't be transactional, and should not have to eagerly load it's tenors.  Having trouble with
+     * the Grizzly tests applying the TransactionServletFilter, but I suspect it will work once deployed to a proper
+     * container =0)
+     */
+    @Transactional
     public Bond findByNameAndMaturity(String name, String maturity) {
         return (Bond) sf.getCurrentSession()
-                .createQuery("from Bond where name=:name and maturity=:maturity")
+                .createQuery("from Bond b  join fetch b.tenors t where b.name=:name and b.maturity=:maturity")
                 .setParameter("name", name)
                 .setParameter("maturity", maturity)
                 .uniqueResult();

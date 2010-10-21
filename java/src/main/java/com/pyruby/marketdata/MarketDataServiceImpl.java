@@ -10,8 +10,10 @@ public class MarketDataServiceImpl implements MarketDataService {
         this.repo = repo;
     }
 
-    public void storeBond(BondRepresentation bondRepr) {
-        repo.save(bondRepr.toBond());
+    public void storeBond(BondRepresentation bondRepr) throws MarketDataServiceException {
+        Bond bond = bondRepr.toBond();
+        if (bond.isValid()) repo.save(bond);
+        else throw new MarketDataServiceException("Bond does not contain mandatory information", null);
     }
 
     public BondRepresentation findBondByNameAndMaturity(String name, String maturity) {
