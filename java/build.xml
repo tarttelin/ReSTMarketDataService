@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="marketdata_service" default="deploy" basedir=".">
+
+
+    <property name="output.dir" value="out/production"/>
+    <property name="testoutput.dir" value="out/test"/>
+    <property name="testresult.dir" value="out/testresult"/>
+    <property name="deploy.dir" value="out/deploy"/>
+    <property name="src" value="src/main"/>
+    <property name="src.test" value="src/test"/>
+    <property name="lib" value="lib"/>
+    <property name="web" value="web"/>
+
+    <path id="test.classpath">
+        <pathelement location="${lib}/build/junit-4.8.2.jar"/>
+        <pathelement location="${lib}/build/mockito-all-1.8.5.jar"/>
+        <path refid="runtime.classpath"/>
+    </path>
+
+    <path  id="thirdparty.classpath">
+        <fileset dir="${lib}/runtime">
+            <include name="**/*.jar"/>
+        </fileset>
+    </path>
+
+    <path id="runtime.classpath">
+        <pathelement location="${output.dir}"/>
+        <path refid="thirdparty.classpath"/>
+    </path>
+
+    <target name="compile" depends="clean" description="Compile marketdata service; production classes">
+        <mkdir dir="${output.dir}"/>
+        <javac destdir="${output.dir}">
+            <src path="${src}/java"/>
+            <classpath refid="thirdparty.classpath"/>
+        </javac>
+        <copy todir="${output.dir}">
+            <fileset dir="${src}/resources" includes="**/*.*"/>
+            <fileset dir="${src}/java" includes="**/*.xml"/>
+        </copy>
+    </target>
+
+    <target name="compile.tests" depends="compile" description="compile marketdata service; test classes"
+            unless="skip.tests">
+        <mkdir dir="${testoutput.dir}"/>
+        <mkdir dir="${testresult.dir}"/>
+        <javac destdir="${testoutput.dir}">
+            <src path="${src.test}/java"/>
+            <classpath>
+                <path refid="test.classpath"/>
+                <pathelement location="${output.dir}"/>
+            </classpath>
+        </javac>
+        <copy todir="${testoutput.dir}">
+            <fileset dir="${src.test}/resources" includes="**/*.*"/>
+        </copy>
+    </target>
+
+    <target name="test" depends="compile.tests" description="Actually Runs the junit Tests">
+        <junit printsummary="on"
+               fork="false"
+               haltonfailure="false"
+               failureproperty="tests.failed"
+               showoutput="true">
+
+            <classpath>
+                <path refid="runtime.classpath"/>
+                <path refid="thirdparty.classpath"/>
+                <path refid="test.classpath"/>
+                <pathelement location="${testoutput.dir}"/>
+            </classpath>
+            <formatter type="xml"/>
+
+            <batchtest todir="${testresult.dir}">
+                <fileset dir="${testoutput.dir}">
+                    <include name="**/*Test.class"/>
+                </fileset>
+            </batchtest>
+        </junit>
+
+        <fail if="tests.failed">
+            *******************************************************
+            *******************************************************
+            One or more tests failed. Check the output...
+            *******************************************************
+            *******************************************************
+        </fail>
+    </target>
+
+    <target name="deploy" depends="test">
+        <war destfile="marketdata.war" webxml="${web}/WEB-INF/web.xml">
+            <lib dir="${lib}/runtime">
+                <include name="**/*.jar"/>
+            </lib>
+            <classes dir="${output.dir}"/>
+        </war>
+    </target>
+
+    <target name="clean" description="cleanup module">
+        <delete dir="${output.dir}"/>
+        <delete dir="${testoutput.dir}"/>
+    </target>
+
+</project>
