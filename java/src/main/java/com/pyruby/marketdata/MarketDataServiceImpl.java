@@ -17,7 +17,7 @@ public class MarketDataServiceImpl implements MarketDataService {
     }
 
     public BondRepresentation findBondByNameAndMaturity(String name, String maturity) {
-        Bond bond = repo.findByNameAndMaturity(name, maturity);
+        Bond bond = repo.findBondByNameAndMaturity(name, maturity);
         return bond != null ? new BondRepresentation(bond) : null;
     }
 }

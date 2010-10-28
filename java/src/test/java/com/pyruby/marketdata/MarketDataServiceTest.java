@@ -9,8 +9,8 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
-import static com.pyruby.marketdata.BondBuilder.newBond;
-import static com.pyruby.marketdata.BondBuilder.newTenor;
+import static com.pyruby.marketdata.CurveBuilder.newBond;
+import static com.pyruby.marketdata.CurveBuilder.newTenor;
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.mock;
@@ -88,10 +88,10 @@ public class MarketDataServiceTest {
 
     @Test
     public void findBondByNameAndMaturity_returnsBondRepresentation_givenAStoredBond() {
-        Bond bond = newBond().name("Yahoo").maturity("3Y").createBond();
+        Bond bond = newBond().name("Yahoo").maturity("3Y").createCurve();
         MarketDataRepository repo = mock(MarketDataRepository.class);
         MarketDataService svc = new MarketDataServiceImpl(repo);
-        when(repo.findByNameAndMaturity("Yahoo", "3Y")).thenReturn(bond);
+        when(repo.findBondByNameAndMaturity("Yahoo", "3Y")).thenReturn(bond);
 
         BondRepresentation found = svc.findBondByNameAndMaturity("Yahoo", "3Y");
 

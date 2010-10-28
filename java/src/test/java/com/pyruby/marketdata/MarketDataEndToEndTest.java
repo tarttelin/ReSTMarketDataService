@@ -17,7 +17,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
-import static com.pyruby.marketdata.BondBuilder.newBond;
+import static com.pyruby.marketdata.CurveBuilder.newBond;
 import static org.junit.Assert.*;
 
 public class MarketDataEndToEndTest {
@@ -111,7 +111,7 @@ public class MarketDataEndToEndTest {
 
     @Test
     public void get_shouldReturnBondXML_givenAStoredBond() throws UnsupportedEncodingException {
-        BondBuilder builder = newBond();
+        CurveBuilder.BondBuilder builder = newBond();
         String request = builder.createXml();
         BondRepresentation repr = builder.createRepresentation();
         WebResource resource = Client.create().resource("http://localhost:9998/ms/marketdata/v1");

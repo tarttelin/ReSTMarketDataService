@@ -4,14 +4,12 @@
         "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 
 <hibernate-mapping package="com.pyruby.marketdata.model">
-    <class name="Bond">
+    <class name="AbstractCurve" abstract="true">
         <id name="id">
             <generator class="native"/>
         </id>
+        <discriminator column="CURVE_TYPE" type="string"/>
         <property name="name"/>
-        <property name="ticker"/>
-        <property name="maturity"/>
-        <property name="issuer"/>
         <list name="tenors">
             <key column="curve_id"/>
             <list-index column="idx" base="0"/>
@@ -20,6 +18,22 @@
                 <property name="interval"/>
             </composite-element>
         </list>
+
+        <subclass name="Bond" discriminator-value="YIELD">
+            <join table="YIELD_CURVE">
+                <key column="CURVE_ID"/>
+                <property name="ticker"/>
+                <property name="maturity"/>
+                <property name="issuer"/>
+            </join>
+        </subclass>
+
+        <subclass name="LiborCurve" discriminator-value="LIBOR">
+            <join table="LIBOR_CURVE">
+                <key column="CURVE_ID"/>
+                <property name="currency"/>
+            </join>
+        </subclass>
     </class>
 
 </hibernate-mapping>

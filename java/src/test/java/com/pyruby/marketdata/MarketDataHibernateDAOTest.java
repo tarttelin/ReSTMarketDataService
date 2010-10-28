@@ -1,13 +1,14 @@
 package com.pyruby.marketdata;
 
 import com.pyruby.marketdata.model.Bond;
-import com.pyruby.marketdata.model.Tenor;
+import com.pyruby.marketdata.model.LiborCurve;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.test.annotation.Rollback;
 
-import java.util.Arrays;
-
+import static com.pyruby.marketdata.CurveBuilder.newBond;
+import static com.pyruby.marketdata.CurveBuilder.newLiborCurve;
+import static com.pyruby.marketdata.CurveBuilder.newTenor;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
@@ -38,20 +39,36 @@ public class MarketDataHibernateDAOTest extends MarketDataIntegrationTestCase {
         bond2.setMaturity("3Y");
         repo.save(bond2);
 
-        Bond foundBond = repo.findByNameAndMaturity(bond2.getName(), bond2.getMaturity());
+        Bond foundBond = repo.findBondByNameAndMaturity(bond2.getName(), bond2.getMaturity());
         assertEquals(bond2.getName(), foundBond.getName());
         assertEquals(bond2.getMaturity(), foundBond.getMaturity());
         assertEquals(bond2.getTenors().size(), foundBond.getTenors().size());
     }
 
     private Bond createBond() {
-        Bond bond = new Bond();
-        bond.setIssuer("British Petrolium");
-        bond.setMaturity("5Y");
-        bond.setName("British Petrolium Ltd");
-        bond.setTicker("LON:BP");
+        return newBond()
+                .issuer("British Petrolium")
+                .maturity("5Y")
+                .name("British Petrolium Ltd")
+                .ticker("LON:BP")
+                .withTenors(newTenor("3m", 35.7)
+                .newTenor("6m", 40.2)
+                .newTenor("1Y", 54.76))
+                .createCurve();
+    }
+    
+    @Test
+    @Rollback
+    public void store_storesLiborCurveWithItsTenors() {
+        LiborCurve libor = newLiborCurve()
+                .name("EURIBOR")
+                .currency("EURO")
+                .withTenors(newTenor("3m", 12)
+                    .newTenor("6m", 12.25)
+                    .newTenor("1Y", 12.75)
+                ).createCurve();
+        repo.save(libor);
 
-        bond.setTenors(Arrays.asList(new Tenor("3m", 35.7), new Tenor("6m", 40.2), new Tenor("1Y", 54.76)));
-        return bond;
+        assertFalse(libor.getId() == 0);
     }
 }

@@ -1,9 +1,10 @@
 package com.pyruby.marketdata;
 
+import com.pyruby.marketdata.model.AbstractCurve;
 import com.pyruby.marketdata.model.Bond;
 
 public interface MarketDataRepository {
-    Bond save(Bond bond);
+    AbstractCurve save(AbstractCurve curve);
 
-    Bond findByNameAndMaturity(String name, String maturity);
+    Bond findBondByNameAndMaturity(String name, String maturity);
 }
