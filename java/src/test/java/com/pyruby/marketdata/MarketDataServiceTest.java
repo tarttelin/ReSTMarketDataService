@@ -1,8 +1,10 @@
 package com.pyruby.marketdata;
 
 import com.pyruby.marketdata.model.Bond;
+import com.pyruby.marketdata.model.LiborCurve;
 import com.pyruby.marketdata.model.Tenor;
 import com.pyruby.marketdata.serializer.BondRepresentation;
+import com.pyruby.marketdata.serializer.LiborCurveRepresentation;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -10,13 +12,13 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 import static com.pyruby.marketdata.CurveBuilder.newBond;
+import static com.pyruby.marketdata.CurveBuilder.newLiborCurve;
 import static com.pyruby.marketdata.CurveBuilder.newTenor;
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
 
 public class MarketDataServiceTest {
     private MarketDataRepository repo;
@@ -29,7 +31,7 @@ public class MarketDataServiceTest {
     }
     
     @Test
-    public void storeBond_marshalsXmlRequestIntoDomainObjectBeforeCallingPersistenceLayer() throws MarketDataServiceException {
+    public void storeBond_convertsRepresentationIntoDomainObjectBeforeCallingPersistenceLayer() throws MarketDataServiceException {
         BondRepresentation bondRepr = newBond()
                 .name("British Petrolium")
                 .ticker("LON:BP")
@@ -97,6 +99,43 @@ public class MarketDataServiceTest {
 
         assertEquals(bond.getName(), found.getName());
         assertEquals(bond.getMaturity(), found.getMaturity());
+    }
+
+    @Test
+    public void storeLiborCurve_convertsRepresentationIntoDomainObjectBeforeCallingPersistenceLayer() throws MarketDataServiceException {
+        LiborCurveRepresentation liborCurveRepr = newLiborCurve()
+                .name("EURIBOR")
+                .currency("EUR")
+                .withTenors(newTenor("3m", 40d)
+                        .newTenor("6m", 42.3d)
+                        .newTenor("9m", 42.3d)
+                        .newTenor("1Y", 45d)
+                        .newTenor("2Y", 47.3d)
+                        .newTenor("3Y", 49.8d)
+                        .newTenor("4Y", 52.3d)
+                        .newTenor("5Y", 55.3d)
+                ).createRepresentation();
+        when(repo.save(isA(LiborCurve.class))).thenAnswer(new Answer<LiborCurve>() {
+            public LiborCurve answer(InvocationOnMock invocationOnMock) throws Throwable {
+                LiborCurve curve = (LiborCurve) invocationOnMock.getArguments()[0];
+                curve.setId(123L);
+                return curve;
+            }
+        });
+        ArgumentCaptor<LiborCurve> capture = ArgumentCaptor.forClass(LiborCurve.class);
+
+        svc.storeLiborCurve(liborCurveRepr);
+
+        verify(repo).save(capture.capture());
+        assertNotNull(capture.getValue());
+
+        LiborCurve liborCurve = capture.getValue();
+
+        assertEquals(8, liborCurve.getTenors().size());
+        assertEquals("EURIBOR", liborCurve.getName());
+        assertEquals("EUR", liborCurve.getCurrency());
+        assertEquals(new Tenor("3m", 40.0), liborCurve.getTenors().get(0));
+        assertEquals(123L, liborCurve.getId());
     }
 
 }

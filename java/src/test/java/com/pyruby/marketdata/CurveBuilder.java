@@ -4,6 +4,7 @@ import com.pyruby.marketdata.model.Bond;
 import com.pyruby.marketdata.model.LiborCurve;
 import com.pyruby.marketdata.model.Tenor;
 import com.pyruby.marketdata.serializer.BondRepresentation;
+import com.pyruby.marketdata.serializer.LiborCurveRepresentation;
 import com.pyruby.marketdata.serializer.TenorRepresentation;
 
 import java.util.ArrayList;
@@ -173,6 +174,14 @@ public class CurveBuilder<T> {
             return curve;
         }
 
+        public LiborCurveRepresentation createRepresentation() {
+            LiborCurveRepresentation repr = new LiborCurveRepresentation();
+            repr.setName(name);
+            repr.setCurrency(currency);
+            for (TenorRepresentation tenorRepr : tenor.createRepresentation()) {
+                repr.addTenor(tenorRepr);
+            }
+            return repr;
+        }
     }
 }
-
