@@ -10,7 +10,7 @@
         </id>
         <discriminator column="CURVE_TYPE" type="string"/>
         <property name="name"/>
-        <list name="tenors">
+        <list name="tenors" table="tenor">
             <key column="curve_id"/>
             <list-index column="idx" base="0"/>
             <composite-element class="Tenor">
