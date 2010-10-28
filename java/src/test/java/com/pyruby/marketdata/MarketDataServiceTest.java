@@ -138,4 +138,11 @@ public class MarketDataServiceTest {
         assertEquals(123L, liborCurve.getId());
     }
 
+    @Test(expected=MarketDataServiceException.class)
+    public void storeLiborCurve_throwsAMarketDataServiceException_givenAnInvalidLiborCurve() throws MarketDataServiceException {
+        MarketDataRepository repo = mock(MarketDataRepository.class);
+        MarketDataService svc = new MarketDataServiceImpl(repo);
+
+        svc.storeLiborCurve(newLiborCurve().name(null).createRepresentation());
+    }
 }

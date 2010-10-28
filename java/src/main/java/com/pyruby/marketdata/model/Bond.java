@@ -32,6 +32,6 @@ public class Bond extends AbstractCurve {
     }
 
     public boolean isValid() {
-        return name != null && maturity != null && tenors != null && !tenors.isEmpty();
+        return super.isValid() && maturity != null;
     }
 }

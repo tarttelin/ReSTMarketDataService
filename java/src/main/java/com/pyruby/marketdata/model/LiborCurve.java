@@ -10,4 +10,8 @@ public class LiborCurve extends AbstractCurve {
     public void setCurrency(String currency) {
         this.currency = currency;
     }
+
+    public boolean isValid() {
+        return super.isValid() && currency != null;
+    }
 }

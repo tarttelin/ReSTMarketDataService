@@ -30,4 +30,8 @@ public abstract class AbstractCurve {
     public long getId() {
         return id;
     }
+
+    public boolean isValid() {
+        return  name != null && tenors != null && !tenors.isEmpty();
+    }
 }

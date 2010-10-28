@@ -170,6 +170,7 @@ public class CurveBuilder<T> {
         public LiborCurve createCurve() {
             LiborCurve curve = new LiborCurve();
             curve.setName(name);
+            curve.setCurrency(currency);
             curve.setTenors(tenor.createTenors());
             return curve;
         }
