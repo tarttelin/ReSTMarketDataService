@@ -184,5 +184,14 @@ public class CurveBuilder<T> {
             }
             return repr;
         }
+
+        public String createXml() {
+            StringBuilder xml = new StringBuilder("<LiborCurve>");
+            if (name != null) xml.append("<Name>").append(name).append("</Name>");
+            if (currency != null) xml.append("<Currency>").append(currency).append("</Currency>");
+            xml.append(tenor.createXml());
+            xml.append("</LiborCurve>");
+            return xml.toString();
+        }
     }
 }

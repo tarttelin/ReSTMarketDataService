@@ -2,6 +2,7 @@ package com.pyruby.marketdata;
 
 import com.pyruby.marketdata.model.AbstractCurve;
 import com.pyruby.marketdata.model.Bond;
+import com.pyruby.marketdata.model.LiborCurve;
 import org.hibernate.SessionFactory;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,6 +33,14 @@ public class MarketDataHibernateDAO implements MarketDataRepository {
                 .createQuery("from Bond b  join fetch b.tenors t where b.name=:name and b.maturity=:maturity")
                 .setParameter("name", name)
                 .setParameter("maturity", maturity)
+                .uniqueResult();
+    }
+
+    @Transactional
+    public LiborCurve findLiborCurveByName(String name) {
+        return (LiborCurve) sf.getCurrentSession()
+                .createQuery("from LiborCurve l join fetch l.tenors t where l.name = :name")
+                .setParameter("name", name)
                 .uniqueResult();
     }
 

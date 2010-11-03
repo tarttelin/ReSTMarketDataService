@@ -11,6 +11,7 @@ import static com.pyruby.marketdata.CurveBuilder.newLiborCurve;
 import static com.pyruby.marketdata.CurveBuilder.newTenor;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 
 public class MarketDataHibernateDAOTest extends MarketDataIntegrationTestCase {
     private MarketDataRepository repo;
@@ -70,5 +71,19 @@ public class MarketDataHibernateDAOTest extends MarketDataIntegrationTestCase {
         repo.save(libor);
 
         assertFalse(libor.getId() == 0);
+    }
+
+    @Test
+    @Rollback
+    public void findLiborCurveByName_returnsLiborCurve_givenAnExistingLiborCurve() {
+        LiborCurve curve = newLiborCurve().name("TEST.JPY").createCurve();
+        repo.save(curve);
+
+        LiborCurve match = repo.findLiborCurveByName(curve.getName());
+
+        assertNotNull(match);
+        assertEquals(curve.getName(), match.getName());
+        assertEquals(curve.getCurrency(), match.getCurrency());
+        assertEquals(curve.getTenors().size(), match.getTenors().size());
     }
 }

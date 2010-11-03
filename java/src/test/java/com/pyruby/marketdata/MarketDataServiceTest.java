@@ -145,4 +145,25 @@ public class MarketDataServiceTest {
 
         svc.storeLiborCurve(newLiborCurve().name(null).createRepresentation());
     }
+
+    @Test
+    public void findLiborCurveByName_returnsNull_givenNoCorrespondingLiborCurve() {
+        MarketDataRepository repo = mock(MarketDataRepository.class);
+        MarketDataService svc = new MarketDataServiceImpl(repo);
+
+        assertNull(svc.findLiborCurveByName("NoSuchCurve"));
+    }
+
+    @Test
+    public void findLiborCurveByName_returnsLiborCurveRepresentation_givenAStoredLiborCurve() {
+        LiborCurve curve = newLiborCurve().name("EURIBOR.EUR").createCurve();
+        MarketDataRepository repo = mock(MarketDataRepository.class);
+        MarketDataService svc = new MarketDataServiceImpl(repo);
+        when(repo.findLiborCurveByName(curve.getName())).thenReturn(curve);
+
+        LiborCurveRepresentation found = svc.findLiborCurveByName(curve.getName());
+
+        assertEquals(curve.getName(), found.getName());
+        assertEquals(curve.getCurrency(), found.getCurrency());
+    }
 }

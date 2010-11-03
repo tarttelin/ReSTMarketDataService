@@ -10,4 +10,6 @@ public interface MarketDataService {
     BondRepresentation findBondByNameAndMaturity(String name, String maturity);
 
     void storeLiborCurve(LiborCurveRepresentation liborCurveRepr) throws MarketDataServiceException;
+
+    LiborCurveRepresentation findLiborCurveByName(String name);
 }

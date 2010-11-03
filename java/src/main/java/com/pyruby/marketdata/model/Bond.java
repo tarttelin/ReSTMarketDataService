@@ -1,7 +1,5 @@
 package com.pyruby.marketdata.model;
 
-import java.util.List;
-
 public class Bond extends AbstractCurve {
     private String ticker;
     private String maturity;

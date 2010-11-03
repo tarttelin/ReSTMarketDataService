@@ -28,4 +28,9 @@ public class MarketDataServiceImpl implements MarketDataService {
         if (curve.isValid()) repo.save(curve);
         else throw new MarketDataServiceException("Libor curve does not contain mandatory information", null);
     }
+
+    public LiborCurveRepresentation findLiborCurveByName(String name) {
+        LiborCurve curve = repo.findLiborCurveByName(name);
+        return curve != null ? new LiborCurveRepresentation(curve) : null;
+    }
 }
